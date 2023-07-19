@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Interest Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <!-- <script src="abi.js"></script>
+    <script src="script.js"></script> -->
+</head>
+
+<body>
+    <h1>Interest Calculator</h1>
+
+    <button onclick="connectToMetaMask()">Connect to MetaMask</button>
+    <p id="accountAddress"></p>
+
+    <h2>Calculate Simple Interest</h2>
+    <label for="principalInput">Principal:</label>
+    <input type="number" id="principalInput" />
+    <br />
+    <label for="rateInput">Rate (%):</label>
+    <input type="number" id="rateInput" />
+    <br />
+    <label for="timeInput">Time (years):</label>
+    <input type="number" id="timeInput" />
+    <br />
+    <button onclick="calculateSimpleInterest()">Calculate</button>
+    <p id="simpleInterestResult"></p>
+
+    <hr>
+
+    <h2>Calculate Total Amount</h2>
+    <label for="principalInput">Principal:</label>
+    <input type="number" id="principalInput" />
+    <br />
+    <label for="rateInput">Rate (%):</label>
+    <input type="number" id="rateInput" />
+    <br />
+    <label for="timeInput">Time (years):</label>
+    <input type="number" id="timeInput" />
+    <br />
+    <button onclick="calculateTotalAmount()">Calculate</button>
+    <p id="totalAmountResult"></p>
+
+    <script>
+         const contractAddress = "0x73511669fd4dE447feD18BB79bAFeAC93aB7F31f";//my contract address
+        const contractABI = [
+        
+
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "principal",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "rate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "time",
+				"type": "uint256"
+			}
+		],
+		"name": "calculateSimpleInterest",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "principal",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "rate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "time",
+				"type": "uint256"
+			}
+		],
+		"name": "calculateTotalAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "payable",
+		"type": "function"
+	}
+
+
+        ];
+        let web3;
+        let contract;
+
+        // Check if MetaMask is installed
+        if (typeof window.ethereum !== 'undefined') {
+            web3 = new Web3(window.ethereum);
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+        } else {
+            console.log("Please install MetaMask");
+        }
+
+        // Function to connect to MetaMask
+        async function connectToMetaMask() {
+            try {
+                // Request access to user accounts
+                await window.ethereum.enable();
+
+                // Get the current account address
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+
+                // Display the account address
+                document.getElementById("accountAddress").textContent = "Connected Account: " + account;
+
+                // Set the default account for transactions
+                web3.eth.defaultAccount = account;
+
+                console.log("Connected to MetaMask:", account);
+            } catch (error) {
+                console.error("Failed:", error);
+            }
+        }
+
+        // Function to calculate simple interest
+        async function calculateSimpleInterest() {
+            const principal = document.getElementById("principalInput").value;
+            const rate = document.getElementById("rateInput").value;
+            const time = document.getElementById("timeInput").value;
+
+            try {
+                const result = await contract.methods.calculateSimpleInterest(principal, rate, time).call();
+                document.getElementById("simpleInterestResult").textContent = `Simple Interest: ${result}`;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Function to calculate total amount
+        async function calculateTotalAmount() {
+            const principal = document.getElementById("principalInput").value;
+            const rate = document.getElementById("rateInput").value;
+            const time = document.getElementById("timeInput").value;
+
+            try {
+                const result = await contract.methods.calculateTotalAmount(principal, rate, time).call();
+                document.getElementById("totalAmountResult").textContent = `Total Amount: ${result}`;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
